@@ -1,0 +1,106 @@
+﻿create database sys_cafe;
+
+use sys_cafe;
+
+
+CREATE TABLE `cliente` (
+  `cod_cliente` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(80) DEFAULT NULL,  
+  `contato` varchar(80) DEFAULT NULL,
+  `cidade` varchar(50) DEFAULT NULL,
+  `endereco` varchar(50) DEFAULT NULL,
+  `estado` varchar(25) DEFAULT NULL,
+  `cep` varchar(9) DEFAULT NULL,
+  `telefone` varchar(25) DEFAULT NULL,
+  `porcentagem` int,
+  `prazo` varchar(10) DEFAULT NULL,
+  `cgc` varchar(25) DEFAULT NULL,
+  `inscricao_est` varchar(20) DEFAULT NULL,
+  `excluido` TINYINT(1)  DEFAULT 0,
+  
+  CONSTRAINT pk_cliente
+		PRIMARY KEY(cod_cliente)
+   
+  
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- INSERT INTO `cliente` (cod_cliente,nome,contato,cidade,endereco,estado,cep,telefone,porcentagem,prazo,cgc,inscricao_est,excluido) VALUES
+
+CREATE TABLE `produto` (
+  `cod_produto` int(11) NOT NULL AUTO_INCREMENT,
+  `produto` varchar(80) DEFAULT NULL, 
+  `peso` float DEFAULT 0.0,
+  `excluido` TINYINT(1)  DEFAULT 0,
+  
+  CONSTRAINT pk_produto
+		PRIMARY KEY(cod_produto)
+   
+  
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+insert into produto(produto, peso) values ('Café 500',0.5), ('Café 250',0.250);
+
+CREATE TABLE `venda` (
+  `cod_venda` int(11) NOT NULL AUTO_INCREMENT,
+  `data_venda` date, 
+  `cod_cliente` int(11),
+  `forma_pagamento` TINYINT(1),
+  `data_vencimento` date,
+  `comissao` float,
+  `total_venda` float,
+  `log_data` DATETIME default NOW(),
+  
+  CONSTRAINT pk_venda
+		PRIMARY KEY(cod_venda),
+	CONSTRAINT fk_venda_cliente
+		FOREIGN KEY(cod_cliente)
+		REFERENCES cliente(cod_cliente)
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
+  
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `venda_produto` (
+  `cod_venda_produto` int(11) NOT NULL AUTO_INCREMENT,
+  `cod_venda` int(11),
+  `cod_produto` int(11),
+  `quantidade` float,
+  `preco` float,
+  `peso_total` float,
+  `valor` float,
+  `log_data` DATETIME default NOW(),
+  
+  CONSTRAINT pk_venda_produto
+		PRIMARY KEY(cod_venda_produto),
+	CONSTRAINT fk_vendaprod_venda
+		FOREIGN KEY(cod_venda)
+		REFERENCES venda(cod_venda)
+		ON UPDATE RESTRICT
+		ON DELETE CASCADE,
+	CONSTRAINT fk_vendaprod_produto
+		FOREIGN KEY(cod_produto)
+		REFERENCES produto(cod_produto)
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
+  
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `recebimento` (
+  `cod_recebimento` int(11) NOT NULL AUTO_INCREMENT,
+  `cod_venda` int(11),
+  `data_recebimento` date,
+  `valor_pago` float default 0,
+  `valor_restante` float default 0,
+  `recebido` tinyint(1) default 0,
+  `valor_entrada` float default 0,
+  `log_data` DATETIME default NOW(),
+  
+  CONSTRAINT pk_recebimento
+		PRIMARY KEY(cod_recebimento),
+	CONSTRAINT fk_recebimento_venda
+		FOREIGN KEY(cod_venda)
+		REFERENCES venda(cod_venda)
+		ON UPDATE RESTRICT
+		ON DELETE CASCADE
+  
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
